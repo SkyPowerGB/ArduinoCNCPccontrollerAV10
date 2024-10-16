@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.9.34728.123
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ArduinoCNCPccontroller", "ArduinoCNCPccontroller\ArduinoCNCPccontroller.csproj", "{B6C59080-6786-48DD-B5BC-6D9FA0753851}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{B6C59080-6786-48DD-B5BC-6D9FA0753851}.Debug|Any CPU.ActiveCfg = Release|Any CPU
+		{B6C59080-6786-48DD-B5BC-6D9FA0753851}.Debug|Any CPU.Build.0 = Release|Any CPU
+		{B6C59080-6786-48DD-B5BC-6D9FA0753851}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B6C59080-6786-48DD-B5BC-6D9FA0753851}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {1CF2D951-6D2A-41B0-9D19-DCC8772CABEE}
+	EndGlobalSection
+EndGlobal
