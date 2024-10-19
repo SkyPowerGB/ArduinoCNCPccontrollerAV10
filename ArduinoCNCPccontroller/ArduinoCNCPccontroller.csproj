@@ -75,7 +75,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ArduinoCNCv10PathCalculator.cs" />
     <Compile Include="ArduinoCommunicatorV2.cs" />
     <Compile Include="CNC controler.cs">
       <SubType>Form</SubType>
@@ -83,7 +82,6 @@
     <Compile Include="CNC controler.Designer.cs">
       <DependentUpon>CNC controler.cs</DependentUpon>
     </Compile>
-    <Compile Include="2Drenderer.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="CNC controler.resx">

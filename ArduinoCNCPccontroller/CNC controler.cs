@@ -48,7 +48,6 @@ namespace ArduinoCNCPccontroller
         {
             controlActive = false;
         }
-
         private void button1_Click(object sender, EventArgs e)
         {
             if (!isConnected)
@@ -61,9 +60,6 @@ namespace ArduinoCNCPccontroller
                 ConnectBtn.Text = "Connect";
             }
         }
-
-
-
 
         private void connectToControler()
         {
@@ -103,9 +99,6 @@ namespace ArduinoCNCPccontroller
         
         }
 
-
-        
-
         private void enableControls()
         {
             controlActive = true;
@@ -131,8 +124,15 @@ namespace ArduinoCNCPccontroller
           
         }
 
+       
         private void OpenFileD_Click(object sender, EventArgs e)
         {
+          
+             
+
+
+
+
             OpenFileDialog fileDialog = new OpenFileDialog();
             fileDialog.Filter = "G-code files (*.gcode;*.nc)|*.gcode;*.nc|All files (*.*)|*.*";
             fileDialog.Title = "Select a G-code file";
@@ -144,6 +144,7 @@ namespace ArduinoCNCPccontroller
                 FilePath = fileDialog.FileName;
                 String name = Path.GetFileName(FilePath);
                 FileNameLbl.Text = name;
+               
             }
         }
 

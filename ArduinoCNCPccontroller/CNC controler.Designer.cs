@@ -72,7 +72,6 @@
             this.lblZpos = new System.Windows.Forms.Label();
             this.lblSpin = new System.Windows.Forms.Label();
             this.lblYpos = new System.Windows.Forms.Label();
-            this.panelDisplay = new System.Windows.Forms.Panel();
             this.label11 = new System.Windows.Forms.Label();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
@@ -286,7 +285,7 @@
             this.groupBox1.Controls.Add(this.XrightBtn);
             this.groupBox1.Controls.Add(this.ZUP);
             this.groupBox1.Controls.Add(this.ZDOWN);
-            this.groupBox1.Location = new System.Drawing.Point(864, 21);
+            this.groupBox1.Location = new System.Drawing.Point(351, 12);
             this.groupBox1.Name = "groupBox1";
             this.groupBox1.Size = new System.Drawing.Size(525, 384);
             this.groupBox1.TabIndex = 19;
@@ -487,7 +486,7 @@
             this.txtRBdebugConsole.Location = new System.Drawing.Point(12, 540);
             this.txtRBdebugConsole.Name = "txtRBdebugConsole";
             this.txtRBdebugConsole.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.Vertical;
-            this.txtRBdebugConsole.Size = new System.Drawing.Size(834, 170);
+            this.txtRBdebugConsole.Size = new System.Drawing.Size(864, 170);
             this.txtRBdebugConsole.TabIndex = 31;
             this.txtRBdebugConsole.Text = "";
             this.txtRBdebugConsole.UseWaitCursor = true;
@@ -538,7 +537,7 @@
             this.groupBox4.Controls.Add(this.label9);
             this.groupBox4.Controls.Add(this.label7);
             this.groupBox4.Controls.Add(this.label8);
-            this.groupBox4.Location = new System.Drawing.Point(864, 426);
+            this.groupBox4.Location = new System.Drawing.Point(351, 426);
             this.groupBox4.Name = "groupBox4";
             this.groupBox4.Size = new System.Drawing.Size(525, 64);
             this.groupBox4.TabIndex = 36;
@@ -581,13 +580,6 @@
             this.lblYpos.TabIndex = 38;
             this.lblYpos.Text = "Y";
             // 
-            // panelDisplay
-            // 
-            this.panelDisplay.Location = new System.Drawing.Point(351, 21);
-            this.panelDisplay.Name = "panelDisplay";
-            this.panelDisplay.Size = new System.Drawing.Size(495, 469);
-            this.panelDisplay.TabIndex = 37;
-            // 
             // label11
             // 
             this.label11.AutoSize = true;
@@ -601,9 +593,8 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1448, 716);
+            this.ClientSize = new System.Drawing.Size(889, 716);
             this.Controls.Add(this.label11);
-            this.Controls.Add(this.panelDisplay);
             this.Controls.Add(this.groupBox4);
             this.Controls.Add(this.txtRBdebugConsole);
             this.Controls.Add(this.groupBox2);
@@ -671,7 +662,6 @@
         private System.Windows.Forms.Label lblZpos;
         private System.Windows.Forms.Label lblSpin;
         private System.Windows.Forms.Label lblYpos;
-        private System.Windows.Forms.Panel panelDisplay;
         private System.Windows.Forms.Label label11;
     }
 }
