@@ -136,7 +136,7 @@
             this.XrightBtn.Font = new System.Drawing.Font("Microsoft Sans Serif", 27.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
             this.XrightBtn.Location = new System.Drawing.Point(209, 116);
             this.XrightBtn.Name = "XrightBtn";
-            this.XrightBtn.Size = new System.Drawing.Size(70, 58);
+            this.XrightBtn.Size = new System.Drawing.Size(70, 68);
             this.XrightBtn.TabIndex = 3;
             this.XrightBtn.Text = "X+";
             this.XrightBtn.UseVisualStyleBackColor = true;
