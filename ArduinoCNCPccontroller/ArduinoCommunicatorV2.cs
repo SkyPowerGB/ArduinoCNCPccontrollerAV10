@@ -6,7 +6,10 @@ using System.IO.Ports;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Forms;
+
 
 namespace ArduinoCNCPccontroller
 {
@@ -63,6 +66,7 @@ namespace ArduinoCNCPccontroller
 
         private SerialPort port;
 
+        private RichTextBox debugTexbox;
         //******************************************************
         //CONSTRUCTORS
         public ArduinoCommunicatorV2(SerialPort port)
@@ -70,6 +74,11 @@ namespace ArduinoCNCPccontroller
             this.port = port;
         }
 
+        public ArduinoCommunicatorV2(SerialPort port , RichTextBox debugBox)
+        {
+            this.port = port;
+            this.debugTexbox = debugBox;
+        }
 
         /************----------------------------------------****/
 
@@ -78,7 +87,11 @@ namespace ArduinoCNCPccontroller
             try
             {
                 port.Open();
-                if (SendTestRepply(startUsbCommunication, usbCommBeginReply, 200)) { return true; }
+                Thread.Sleep(2000);
+                if (SendTestRepply(startUsbCommunication, usbCommBeginReply, 200,3)) {
+                    LogLn("succes");
+                    
+                    return true; }
                 else
                 {
                     port.Close();
@@ -103,7 +116,7 @@ namespace ArduinoCNCPccontroller
         public void SendCmd(String cmd)
         {
             port.DiscardInBuffer();
-            Console.WriteLine("Sending:" + cmd);
+            LogLn("Sending ;"+cmd);
 
 
 
@@ -112,6 +125,7 @@ namespace ArduinoCNCPccontroller
         }
         public String ReadResponseCMD()
         {
+            LogLn("GetResult ");
             String s = "";
             char c = ' ';
             int i = 1;
@@ -131,7 +145,7 @@ namespace ArduinoCNCPccontroller
                         }
                         else
                         {
-                            Console.WriteLine("read cmd:" + s);
+                            LogLn("Recive answer cmd:" + s);
                             s.Split();
 
                             return s.Trim();
@@ -159,6 +173,7 @@ namespace ArduinoCNCPccontroller
             response.Clear();
             Stopwatch sw = new Stopwatch();
             sw.Start();
+            LogLn("GetResult w timeout");
 
             try
             {
@@ -176,13 +191,13 @@ namespace ArduinoCNCPccontroller
                                     c = (char)port.ReadChar();
                                     if (c == '#')
                                     {
-                                        Console.WriteLine("read cmd:" + response.ToString());
+                                        LogLn("read cmd answer with timeout:" + response.ToString());
                                         return response.ToString().Trim();
                                     }
                                     response.Append(c);
                                 }
                             }
-                            Console.WriteLine("timeout  $#");
+                            LogLn("Timeout");
 
                             return response.ToString();
                         }
@@ -203,6 +218,7 @@ namespace ArduinoCNCPccontroller
         }
         public String SendAndWRepply(String msg, int retry, int timeout)
         {
+
 
             String reply = "";
             for (int i = 0; i < retry; i++)
@@ -236,6 +252,8 @@ namespace ArduinoCNCPccontroller
         {
             String result = SendAndWRepply(msg, timeout);
 
+            LogLn("Send and wait, recived:"+result);
+
             if (result.Contains(expectedRepply))
             {
                 return true;
@@ -244,7 +262,21 @@ namespace ArduinoCNCPccontroller
 
 
         }
-      
+        public bool SendTestRepply(String msg, String expectedRepply, int timeout,int retry)
+        {
+            String result = SendAndWRepply(msg,retry, timeout);
+
+            LogLn("Send and wait, recived:" + result);
+
+            if (result.Contains(expectedRepply))
+            {
+                return true;
+            }
+            return false;
+
+
+        }
+
         // send G-Code proper
         private void SendGcode(String gcode)
         {
@@ -306,13 +338,15 @@ namespace ArduinoCNCPccontroller
             return output;
 
         }
-      
-      
+
+
         //*************************************************************************
         // Gcode Stream;
+
+       private bool streaming = false;
         public void StreamGcodeFile(String filePath, int startLine)
         {
-            bool streaming = true;
+            streaming = true;
             bool pause = false;
 
             int i = 1;
@@ -339,9 +373,12 @@ namespace ArduinoCNCPccontroller
             }
         }
 
-        public async Task StreamGcodeFileAsync(String filePath, int startline) {
-
-            bool streaming = true;
+        public async Task<bool> StreamGcodeFileAsync(String filePath, int startline) {
+            LogLn("Strart GC stream");
+            if (!streaming)
+            {
+                streaming = true;
+            }
             bool pause = false;
 
             int i = 1;
@@ -349,9 +386,11 @@ namespace ArduinoCNCPccontroller
             {
                 using (StreamReader reader = new StreamReader(filePath))
                 {
+                    LogLn("Strart GC stream ready!");
                     String line;
-                    while ((line = reader.ReadLine()) != null && !streaming)
+                    while ((line = reader.ReadLine()) != null && streaming)
                     {
+                        LogLn(" GC stream readLine");
                         if (i >= startline)
                         {
                             SendGcode(line);
@@ -364,16 +403,25 @@ namespace ArduinoCNCPccontroller
 
                         i++;
                     }
+                    return true;
                 }
             }
             catch (Exception e)
             {
-
+                return true;
             }
 
-
+            return true;
 
         }
+
+        //*------------------------------------------------------------------------------
+        // GCODE STRAM CONTORL
+
+        public bool IsGcStreamRunning() { return streaming; }
+
+        public void StopGcStream() { streaming = false; }
+    
         
         //*************************************************************************
 
@@ -401,8 +449,8 @@ namespace ArduinoCNCPccontroller
 
        
 
-        public void MoveAxis(char axis , int steps, string speed) {
-            String move= "G90 G1  ";
+        public void MoveAxis(char axis , string steps, string speed) {
+            String move= "G90 G1 ";
             move += axis;
             move += steps;
             move += " ";
@@ -412,8 +460,8 @@ namespace ArduinoCNCPccontroller
             SendGcode(move);
         }
         
-        public void MoveDiagonal(char axisA, char axisB, int stepsA, int stepsB, string speed) {
-            String move = "G90 G1  ";
+        public void MoveDiagonal(char axisA, char axisB, string stepsA, string stepsB, string speed) {
+            String move = "G90 G1 ";
             move += axisA;
             move += stepsA;
             move += " ";
@@ -431,7 +479,7 @@ namespace ArduinoCNCPccontroller
 
 
         public void StartSpindle(int speed) {
-            String move = "M3  ";
+            String move = "M3 ";
             move += "S";
             move+= speed;
 
@@ -451,6 +499,40 @@ namespace ArduinoCNCPccontroller
         // SPECIAL FOR DEBUG / SHOW
 
 
+
+
+        //*--------------------------------------------------------------------------------------------------------------
+
+        public void LogLn(string text)
+        {
+            Console.WriteLine(text); 
+
+            
+            if (debugTexbox != null)
+            {
+               
+                text += Environment.NewLine;
+
+                if (debugTexbox.InvokeRequired)
+                {
+                    debugTexbox.Invoke(new Action(() => debugTexbox.AppendText(text)));
+                }
+                else
+                {
+                    debugTexbox.AppendText(text); 
+                }
+            }
+        }
+
+        public void Log(String text)
+        {
+            Console.Write(text);
+            if (debugTexbox != null)
+            {
+                debugTexbox.Text += text;
+
+            }
+        }
     }
 
 

@@ -58,6 +58,7 @@ namespace ArduinoCNCPccontroller
             else
             {
                 disconnectFromControler();
+                ConnectBtn.Text = "Connect";
             }
         }
 
@@ -80,11 +81,19 @@ namespace ArduinoCNCPccontroller
                 };
 
               
-                communicatorV2 = new ArduinoCommunicatorV2(port);
+                communicatorV2 = new ArduinoCommunicatorV2(port,txtRBdebugConsole);
+
+
+
 
                 bool openPort=communicatorV2.Connect();
                 if (openPort) {
-                    isConnected = true; } else
+                    isConnected = true;
+
+
+                ConnectBtn.Text = "Disconnect";
+            
+            } else
                 {
                     isConnected = false;
                 }
@@ -127,24 +136,55 @@ namespace ArduinoCNCPccontroller
             OpenFileDialog fileDialog = new OpenFileDialog();
             fileDialog.Filter = "G-code files (*.gcode;*.nc)|*.gcode;*.nc|All files (*.*)|*.*";
             fileDialog.Title = "Select a G-code file";
+            
+
             DialogResult result = fileDialog.ShowDialog();
             if (result == DialogResult.OK)
             {
                 FilePath = fileDialog.FileName;
-                
+                String name = Path.GetFileName(FilePath);
+                FileNameLbl.Text = name;
             }
         }
 
         private async void RunFile_Click(object sender, EventArgs e)
         {
 
+            if (!communicatorV2.IsGcStreamRunning())
+            {
+                RunFile.BackColor = Color.Red;
+                RunFile.Text = "STOP";
+           
+
+            }
+            else { 
+       
+             
+                RunFile.BackColor = Color.LightGreen;
+                RunFile.Text = "Run";
+                communicatorV2.StopGcStream();
+                return;
+            }
+
+
+          
           
             if (!isConnected) { return; }
             disableControls();
-           await communicatorV2.StreamGcodeFileAsync(FilePath,0);
-            enableControls();
+         bool done=  await communicatorV2.StreamGcodeFileAsync(FilePath,0);
+            if (done)
+            {
+
+                RunFile.BackColor = Color.LightGreen;
+                RunFile.Text = "Run";
+                enableControls();
+            }
           
         }
+
+        private void RunBtnStop() { }
+
+
         private void showErrorMsg(String msg) {
             MessageBox.Show(msg);
         }
@@ -212,14 +252,14 @@ namespace ArduinoCNCPccontroller
         private void YforwardBtn_Click(object sender, EventArgs e)
         {
             if (!isConnected) { return; }
-            communicatorV2.MoveAxis('Y', (int)CbSpindleSpd.SelectedItem, CbFeedRate.SelectedItem.ToString());
+            communicatorV2.MoveAxis('Y', CbSteps.SelectedItem.ToString(), CbFeedRate.SelectedItem.ToString());
         }
 
         private void YbackBtn_Click(object sender, EventArgs e)
         {
             if (!isConnected) { return; }
 
-            communicatorV2.MoveAxis('Y',-(int)CbSpindleSpd.SelectedItem,CbFeedRate.SelectedItem.ToString());
+            communicatorV2.MoveAxis('Y', "-" + CbSteps.SelectedItem.ToString() , CbFeedRate.SelectedItem.ToString());
             
 
         }
@@ -228,12 +268,12 @@ namespace ArduinoCNCPccontroller
         {
             if (!isConnected) { return; }
 
-            communicatorV2.MoveAxis('X', (int)CbSpindleSpd.SelectedItem, CbFeedRate.SelectedItem.ToString());
+            communicatorV2.MoveAxis('X', CbSteps.SelectedItem.ToString(), CbFeedRate.SelectedItem.ToString());
         }
 
         private void XleftBtn_Click(object sender, EventArgs e)
         {
-            communicatorV2.MoveAxis('X', -(int)CbSpindleSpd.SelectedItem, CbFeedRate.SelectedItem.ToString());
+            communicatorV2.MoveAxis('X', "-" + CbSteps.SelectedItem.ToString() , CbFeedRate.SelectedItem.ToString());
 
          
         }
@@ -241,13 +281,13 @@ namespace ArduinoCNCPccontroller
         private void ZUP_Click(object sender, EventArgs e)
         {
 
-            communicatorV2.MoveAxis('Z', (int)CbSpindleSpd.SelectedItem, CbFeedRate.SelectedItem.ToString());
+            communicatorV2.MoveAxis('Z', CbSteps.SelectedItem.ToString(), CbFeedRate.SelectedItem.ToString());
         }
 
         private void ZDOWN_Click(object sender, EventArgs e)
         {
 
-            communicatorV2.MoveAxis('Z', -(int)CbSpindleSpd.SelectedItem, CbFeedRate.SelectedItem.ToString());
+            communicatorV2.MoveAxis('Z', "-" + CbSteps.SelectedItem.ToString(), CbFeedRate.SelectedItem.ToString());
         }
 
 
@@ -359,21 +399,31 @@ namespace ArduinoCNCPccontroller
 
         private void XpYpBtn_Click(object sender, EventArgs e)
         {
-            communicatorV2.MoveDiagonal('X', 'Y',  (int)CbSteps.SelectedItem, (int)CbSteps.SelectedItem, CbFeedRate.SelectedItem.ToString());
+            communicatorV2.MoveDiagonal('X', 'Y', CbSteps.SelectedItem.ToString(), CbSteps.SelectedItem.ToString() , CbFeedRate.SelectedItem.ToString());
         }
 
         private void XnYpBtn_Click(object sender, EventArgs e)
         {
-            communicatorV2.MoveDiagonal('X', 'Y', - (int)CbSteps.SelectedItem, (int)CbSteps.SelectedItem, CbFeedRate.SelectedItem.ToString());
+            communicatorV2.MoveDiagonal('X', 'Y', "-" + CbSteps.SelectedItem.ToString()  , CbSteps.SelectedItem.ToString()  , CbFeedRate.SelectedItem.ToString());
         }
 
         private void XnYnBtn_Click(object sender, EventArgs e) {
         
-            communicatorV2.MoveDiagonal('X', 'Y', -(int)CbSteps.SelectedItem,- (int)CbSteps.SelectedItem,CbFeedRate.SelectedItem.ToString());
+            communicatorV2.MoveDiagonal('X', 'Y', "-"+ CbSteps.SelectedItem.ToString() ,"-"+ CbSteps.SelectedItem.ToString(), CbFeedRate.SelectedItem.ToString());
         }
         private void XpYnBtn_Click(object sender, EventArgs e)
         {
-            communicatorV2.MoveDiagonal('X', 'Y', (int)CbSteps.SelectedItem, - (int)CbSteps.SelectedItem, CbFeedRate.SelectedItem.ToString());
+            communicatorV2.MoveDiagonal('X', 'Y', CbSteps.SelectedItem.ToString() , "-" + CbSteps.SelectedItem.ToString(), (String)CbFeedRate.SelectedItem);
+        }
+
+        private void CbFeedRate_SelectedIndexChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void CbSteps_SelectedIndexChanged(object sender, EventArgs e)
+        {
+
         }
     }
 
