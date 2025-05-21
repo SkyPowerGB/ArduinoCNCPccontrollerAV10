@@ -26,7 +26,7 @@ A custom CNC control system consisting of a C# Windows Forms application (built 
 
 ---
 
-## 🔧 Arduino Firmware (`CNC_V10`)
+## 🔧 Arduino Firmware (`arduinoCNC_V0.0.10U`)
 
 ### ✨ Features
 
