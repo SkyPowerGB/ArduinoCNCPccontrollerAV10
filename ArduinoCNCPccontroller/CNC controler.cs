@@ -10,6 +10,7 @@ using System.IO.Ports;
 using System.Windows.Forms;
 using System.IO;
 using System.Threading;
+using ArduinoCNCPccontroller.classes;
 
 namespace ArduinoCNCPccontroller
 {
@@ -17,6 +18,11 @@ namespace ArduinoCNCPccontroller
     {
         String[] ports;
         SerialPort port;
+
+        JsonModelManager modelManager;
+
+        Point cursor;
+        Bitmap canvas;
     
         ArduinoCommunicatorV2 communicatorV2;
         bool connected = false;
@@ -24,9 +30,23 @@ namespace ArduinoCNCPccontroller
         bool controlActive = true;
         String FilePath;
 
+
+        bool isConnected = false;
         public CNC_PC_controller()
         {
+
             InitializeComponent();
+
+            cursor = new Point();
+            cursor.X = previewDrawBoard.Width / 2;
+            cursor.Y=previewDrawBoard.Height / 2;
+            canvas=new Bitmap(previewDrawBoard.Width, previewDrawBoard.Height);
+            modelManager = new JsonModelManager();
+            RefreshData();
+
+           
+          
+
             disableControls();
             getAvailableComPorts();
             foreach (string port in ports)
@@ -39,11 +59,35 @@ namespace ArduinoCNCPccontroller
             }
         }
 
+
+        public void RefreshData()
+        {
+            modelManager.Load();
+            string workspaceSizeLbl= "Workspace:";
+            workspaceSizeLbl += modelManager.Settings.machineWorkspaceMMX;
+            workspaceSizeLbl += "mm x ";
+            workspaceSizeLbl += modelManager.Settings.machineWorkspaceMMY;
+            workspaceSizeLbl += "mm";
+            lblWorkspaceSize.Text = workspaceSizeLbl;
+
+            string steps = "  XstepSize: ";
+            steps += modelManager.Settings.x_resolution + "mm ";
+            steps += "YstepSize: ";
+            steps += modelManager.Settings.y_resolution + "mm ";
+
+            lblXYstepSize.Text = steps;
+
+            var draw = modelManager.Settings.z_draw;
+            tbZperview.Text =draw.ToString();
+
+
+        }
+
         private void getAvailableComPorts()
         {
             ports = SerialPort.GetPortNames();
         }
-        bool isConnected = false;
+      
         private void disableControls()
         {
             controlActive = false;
@@ -77,7 +121,7 @@ namespace ArduinoCNCPccontroller
                 };
 
               
-                communicatorV2 = new ArduinoCommunicatorV2(port,txtRBdebugConsole);
+                communicatorV2 = new ArduinoCommunicatorV2(port,txtRBdebugConsole,this);
 
 
 
@@ -190,8 +234,7 @@ namespace ArduinoCNCPccontroller
             MessageBox.Show(msg);
         }
 
-       
-
+      
         private void ShowMessageBox(string message)
         {
             if (InvokeRequired)
@@ -215,7 +258,6 @@ namespace ArduinoCNCPccontroller
             if (!isConnected) { return; }
         }
 
-      
 
         private void outputLbl_Click(object sender, EventArgs e)
         {
@@ -236,8 +278,6 @@ namespace ArduinoCNCPccontroller
 
         }
 
-      
-
         private void SendManulaBtn_Click(object sender, EventArgs e)
         {
             if (!isConnected) { return; }
@@ -245,10 +285,6 @@ namespace ArduinoCNCPccontroller
          
 
         }
-
-  
-   
-
 
         private void YforwardBtn_Click(object sender, EventArgs e)
         {
@@ -291,10 +327,6 @@ namespace ArduinoCNCPccontroller
             communicatorV2.MoveAxis('Z', "-" + CbSteps.SelectedItem.ToString(), CbFeedRate.SelectedItem.ToString());
         }
 
-
-
-
-
         private void HomeBtn_Click(object sender, EventArgs e)
         {
             if (!isConnected) { return; }
@@ -303,7 +335,6 @@ namespace ArduinoCNCPccontroller
             communicatorV2.Home();
         }
 
- 
         private void SpindleOnBtn_Click(object sender, EventArgs e)
         {
             if (!isConnected) { return; }
@@ -394,10 +425,7 @@ namespace ArduinoCNCPccontroller
             
         }
 
-     
-
-      
-
+    
         private void XpYpBtn_Click(object sender, EventArgs e)
         {
             communicatorV2.MoveDiagonal('X', 'Y', CbSteps.SelectedItem.ToString(), CbSteps.SelectedItem.ToString() , CbFeedRate.SelectedItem.ToString());
@@ -423,6 +451,69 @@ namespace ArduinoCNCPccontroller
         }
 
         private void CbSteps_SelectedIndexChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void previewBtn_Click(object sender, EventArgs e)
+        {
+
+        }
+
+
+        public void drawLine(Point newPoint, Color color, int width)
+        {
+        
+            Point newAbsPoint = new Point(cursor.X + newPoint.X, cursor.Y + newPoint.Y);
+
+            if (previewDrawBoard.InvokeRequired)
+            {
+                Point drawPointCopy = newAbsPoint; 
+                previewDrawBoard.BeginInvoke((MethodInvoker)(() =>
+                {
+                    using (Graphics g = Graphics.FromImage(canvas))
+                    {
+                        g.DrawLine(new Pen(color, width), cursor, drawPointCopy);
+                    }
+                    previewDrawBoard.Invalidate();
+                    cursor = drawPointCopy;
+                }));
+                return;
+            }
+
+    
+            using (Graphics g = Graphics.FromImage(canvas))
+            {
+                g.DrawLine(new Pen(color, width), cursor, newAbsPoint);
+            }
+            previewDrawBoard.Invalidate();
+            cursor = newAbsPoint;
+        }
+        public void ClearCanvas()
+        {
+            if (previewDrawBoard.InvokeRequired)
+            {
+                previewDrawBoard.Invoke((MethodInvoker)(() => ClearCanvas()));
+                return;
+            }
+
+            using (Graphics g = Graphics.FromImage(canvas))
+            {
+                g.Clear(Color.White);
+            }
+
+            previewDrawBoard.Invalidate();
+            cursor = new Point(previewDrawBoard.Width / 2, previewDrawBoard.Height / 2);
+        }
+        public int getCanvasWidth()
+        {
+            return canvas.Width;
+        }
+        public int getCanvasHeight()
+        {
+             return canvas.Height; }
+
+        private void btnSettings_Click(object sender, EventArgs e)
         {
 
         }

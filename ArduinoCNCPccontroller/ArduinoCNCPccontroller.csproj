@@ -58,9 +58,12 @@
     <GenerateManifests>true</GenerateManifests>
   </PropertyGroup>
   <PropertyGroup>
-    <SignManifests>true</SignManifests>
+    <SignManifests>false</SignManifests>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.13.0.4\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Messaging" />
@@ -76,16 +79,38 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ArduinoCommunicatorV2.cs" />
+    <Compile Include="classes\ArduinoComunicatorV3.cs" />
+    <Compile Include="classes\JsonModelManager.cs" />
+    <Compile Include="classes\SettingsModel.cs" />
     <Compile Include="CNC controler.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="CNC controler.Designer.cs">
       <DependentUpon>CNC controler.cs</DependentUpon>
     </Compile>
+    <Compile Include="static\commandList.cs" />
+    <Compile Include="Forms\FullPreview.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\FullPreview.Designer.cs">
+      <DependentUpon>FullPreview.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\SettingsForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\SettingsForm.Designer.cs">
+      <DependentUpon>SettingsForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="CNC controler.resx">
       <DependentUpon>CNC controler.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\FullPreview.resx">
+      <DependentUpon>FullPreview.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\SettingsForm.resx">
+      <DependentUpon>SettingsForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
@@ -97,6 +122,7 @@
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
     <None Include="ArduinoCNCPccontroller_TemporaryKey.pfx" />
+    <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>

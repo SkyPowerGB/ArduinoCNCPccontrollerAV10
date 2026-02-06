@@ -61,6 +61,7 @@
             this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.RefreshBtn = new System.Windows.Forms.Button();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
+            this.btnPreview = new System.Windows.Forms.Button();
             this.FileNameLbl = new System.Windows.Forms.Label();
             this.txtRBdebugConsole = new System.Windows.Forms.RichTextBox();
             this.label5 = new System.Windows.Forms.Label();
@@ -73,10 +74,21 @@
             this.lblSpin = new System.Windows.Forms.Label();
             this.lblYpos = new System.Windows.Forms.Label();
             this.label11 = new System.Windows.Forms.Label();
+            this.groupBox5 = new System.Windows.Forms.GroupBox();
+            this.tbZperview = new System.Windows.Forms.TextBox();
+            this.label13 = new System.Windows.Forms.Label();
+            this.btnFullPreview = new System.Windows.Forms.Button();
+            this.previewDrawBoard = new System.Windows.Forms.PictureBox();
+            this.lblXYstepSize = new System.Windows.Forms.Label();
+            this.lblWorkspaceSize = new System.Windows.Forms.Label();
+            this.btnSettings = new System.Windows.Forms.Button();
+            this.checkBox1 = new System.Windows.Forms.CheckBox();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.groupBox3.SuspendLayout();
             this.groupBox4.SuspendLayout();
+            this.groupBox5.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.previewDrawBoard)).BeginInit();
             this.SuspendLayout();
             // 
             // ConnectBtn
@@ -92,9 +104,9 @@
             // PortsList
             // 
             this.PortsList.FormattingEnabled = true;
-            this.PortsList.Location = new System.Drawing.Point(0, 37);
+            this.PortsList.Location = new System.Drawing.Point(6, 37);
             this.PortsList.Name = "PortsList";
-            this.PortsList.Size = new System.Drawing.Size(267, 21);
+            this.PortsList.Size = new System.Drawing.Size(261, 21);
             this.PortsList.TabIndex = 1;
             this.PortsList.SelectedIndexChanged += new System.EventHandler(this.PortsList_SelectedIndexChanged);
             // 
@@ -186,7 +198,7 @@
             // 
             // OpenFileD
             // 
-            this.OpenFileD.Location = new System.Drawing.Point(2, 19);
+            this.OpenFileD.Location = new System.Drawing.Point(0, 24);
             this.OpenFileD.Name = "OpenFileD";
             this.OpenFileD.Size = new System.Drawing.Size(330, 39);
             this.OpenFileD.TabIndex = 9;
@@ -198,9 +210,9 @@
             // 
             this.RunFile.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(128)))), ((int)(((byte)(255)))), ((int)(((byte)(128)))));
             this.RunFile.Font = new System.Drawing.Font("Microsoft Sans Serif", 36F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
-            this.RunFile.Location = new System.Drawing.Point(2, 175);
+            this.RunFile.Location = new System.Drawing.Point(6, 134);
             this.RunFile.Name = "RunFile";
-            this.RunFile.Size = new System.Drawing.Size(330, 68);
+            this.RunFile.Size = new System.Drawing.Size(321, 61);
             this.RunFile.TabIndex = 10;
             this.RunFile.TabStop = false;
             this.RunFile.Text = "Run";
@@ -285,7 +297,7 @@
             this.groupBox1.Controls.Add(this.XrightBtn);
             this.groupBox1.Controls.Add(this.ZUP);
             this.groupBox1.Controls.Add(this.ZDOWN);
-            this.groupBox1.Location = new System.Drawing.Point(351, 12);
+            this.groupBox1.Location = new System.Drawing.Point(356, 41);
             this.groupBox1.Name = "groupBox1";
             this.groupBox1.Size = new System.Drawing.Size(525, 384);
             this.groupBox1.TabIndex = 19;
@@ -441,9 +453,9 @@
             this.groupBox2.Controls.Add(this.ConnectBtn);
             this.groupBox2.Controls.Add(this.PortsList);
             this.groupBox2.Controls.Add(this.label4);
-            this.groupBox2.Location = new System.Drawing.Point(7, 12);
+            this.groupBox2.Location = new System.Drawing.Point(12, 41);
             this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(338, 160);
+            this.groupBox2.Size = new System.Drawing.Size(338, 120);
             this.groupBox2.TabIndex = 29;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Connection";
@@ -460,16 +472,28 @@
             // 
             // groupBox3
             // 
+            this.groupBox3.Controls.Add(this.btnPreview);
             this.groupBox3.Controls.Add(this.FileNameLbl);
             this.groupBox3.Controls.Add(this.OpenFileD);
             this.groupBox3.Controls.Add(this.RunFile);
             this.groupBox3.Controls.Add(this.label6);
-            this.groupBox3.Location = new System.Drawing.Point(7, 215);
+            this.groupBox3.Location = new System.Drawing.Point(12, 167);
             this.groupBox3.Name = "groupBox3";
-            this.groupBox3.Size = new System.Drawing.Size(338, 275);
+            this.groupBox3.Size = new System.Drawing.Size(338, 352);
             this.groupBox3.TabIndex = 30;
             this.groupBox3.TabStop = false;
             this.groupBox3.Text = "Run G-code";
+            // 
+            // btnPreview
+            // 
+            this.btnPreview.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
+            this.btnPreview.Location = new System.Drawing.Point(6, 201);
+            this.btnPreview.Name = "btnPreview";
+            this.btnPreview.Size = new System.Drawing.Size(321, 39);
+            this.btnPreview.TabIndex = 28;
+            this.btnPreview.Text = "Preview";
+            this.btnPreview.UseVisualStyleBackColor = true;
+            this.btnPreview.Click += new System.EventHandler(this.previewBtn_Click);
             // 
             // FileNameLbl
             // 
@@ -483,10 +507,11 @@
             // 
             // txtRBdebugConsole
             // 
-            this.txtRBdebugConsole.Location = new System.Drawing.Point(12, 540);
+            this.txtRBdebugConsole.ImeMode = System.Windows.Forms.ImeMode.Hiragana;
+            this.txtRBdebugConsole.Location = new System.Drawing.Point(17, 541);
             this.txtRBdebugConsole.Name = "txtRBdebugConsole";
             this.txtRBdebugConsole.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.Vertical;
-            this.txtRBdebugConsole.Size = new System.Drawing.Size(864, 170);
+            this.txtRBdebugConsole.Size = new System.Drawing.Size(864, 340);
             this.txtRBdebugConsole.TabIndex = 31;
             this.txtRBdebugConsole.Text = "";
             this.txtRBdebugConsole.UseWaitCursor = true;
@@ -537,7 +562,7 @@
             this.groupBox4.Controls.Add(this.label9);
             this.groupBox4.Controls.Add(this.label7);
             this.groupBox4.Controls.Add(this.label8);
-            this.groupBox4.Location = new System.Drawing.Point(351, 426);
+            this.groupBox4.Location = new System.Drawing.Point(356, 431);
             this.groupBox4.Name = "groupBox4";
             this.groupBox4.Size = new System.Drawing.Size(525, 64);
             this.groupBox4.TabIndex = 36;
@@ -583,17 +608,107 @@
             // label11
             // 
             this.label11.AutoSize = true;
-            this.label11.Location = new System.Drawing.Point(21, 514);
+            this.label11.Location = new System.Drawing.Point(20, 525);
             this.label11.Name = "label11";
             this.label11.Size = new System.Drawing.Size(39, 13);
             this.label11.TabIndex = 41;
             this.label11.Text = "Debug";
             // 
+            // groupBox5
+            // 
+            this.groupBox5.Controls.Add(this.tbZperview);
+            this.groupBox5.Controls.Add(this.label13);
+            this.groupBox5.Controls.Add(this.btnFullPreview);
+            this.groupBox5.Controls.Add(this.previewDrawBoard);
+            this.groupBox5.Controls.Add(this.lblXYstepSize);
+            this.groupBox5.Controls.Add(this.lblWorkspaceSize);
+            this.groupBox5.Location = new System.Drawing.Point(887, 42);
+            this.groupBox5.Name = "groupBox5";
+            this.groupBox5.Size = new System.Drawing.Size(446, 839);
+            this.groupBox5.TabIndex = 42;
+            this.groupBox5.TabStop = false;
+            this.groupBox5.Text = "Preview";
+            // 
+            // tbZperview
+            // 
+            this.tbZperview.Location = new System.Drawing.Point(233, 470);
+            this.tbZperview.Name = "tbZperview";
+            this.tbZperview.Size = new System.Drawing.Size(100, 20);
+            this.tbZperview.TabIndex = 48;
+            this.tbZperview.Text = "0";
+            // 
+            // label13
+            // 
+            this.label13.AutoSize = true;
+            this.label13.Location = new System.Drawing.Point(230, 454);
+            this.label13.Name = "label13";
+            this.label13.Size = new System.Drawing.Size(86, 13);
+            this.label13.TabIndex = 47;
+            this.label13.Text = "Preview Z below";
+            // 
+            // btnFullPreview
+            // 
+            this.btnFullPreview.Location = new System.Drawing.Point(10, 444);
+            this.btnFullPreview.Name = "btnFullPreview";
+            this.btnFullPreview.Size = new System.Drawing.Size(203, 52);
+            this.btnFullPreview.TabIndex = 46;
+            this.btnFullPreview.Text = "Full Preview";
+            this.btnFullPreview.UseVisualStyleBackColor = true;
+            // 
+            // previewDrawBoard
+            // 
+            this.previewDrawBoard.Location = new System.Drawing.Point(6, 37);
+            this.previewDrawBoard.Name = "previewDrawBoard";
+            this.previewDrawBoard.Size = new System.Drawing.Size(434, 396);
+            this.previewDrawBoard.TabIndex = 45;
+            this.previewDrawBoard.TabStop = false;
+            // 
+            // lblXYstepSize
+            // 
+            this.lblXYstepSize.AutoSize = true;
+            this.lblXYstepSize.Location = new System.Drawing.Point(177, 20);
+            this.lblXYstepSize.Name = "lblXYstepSize";
+            this.lblXYstepSize.Size = new System.Drawing.Size(156, 13);
+            this.lblXYstepSize.TabIndex = 44;
+            this.lblXYstepSize.Text = "Xstep:0.025mm Ystep:0.025mm";
+            // 
+            // lblWorkspaceSize
+            // 
+            this.lblWorkspaceSize.AutoSize = true;
+            this.lblWorkspaceSize.Location = new System.Drawing.Point(7, 20);
+            this.lblWorkspaceSize.Name = "lblWorkspaceSize";
+            this.lblWorkspaceSize.Size = new System.Drawing.Size(125, 13);
+            this.lblWorkspaceSize.TabIndex = 43;
+            this.lblWorkspaceSize.Text = "Workspace: 100x100mm";
+            // 
+            // btnSettings
+            // 
+            this.btnSettings.Location = new System.Drawing.Point(12, 12);
+            this.btnSettings.Name = "btnSettings";
+            this.btnSettings.Size = new System.Drawing.Size(75, 23);
+            this.btnSettings.TabIndex = 43;
+            this.btnSettings.Text = "Settings";
+            this.btnSettings.UseVisualStyleBackColor = true;
+            this.btnSettings.Click += new System.EventHandler(this.btnSettings_Click);
+            // 
+            // checkBox1
+            // 
+            this.checkBox1.AutoSize = true;
+            this.checkBox1.Location = new System.Drawing.Point(825, 518);
+            this.checkBox1.Name = "checkBox1";
+            this.checkBox1.Size = new System.Drawing.Size(56, 17);
+            this.checkBox1.TabIndex = 35;
+            this.checkBox1.Text = "debug";
+            this.checkBox1.UseVisualStyleBackColor = true;
+            // 
             // CNC_PC_controller
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(889, 716);
+            this.ClientSize = new System.Drawing.Size(1341, 893);
+            this.Controls.Add(this.checkBox1);
+            this.Controls.Add(this.btnSettings);
+            this.Controls.Add(this.groupBox5);
             this.Controls.Add(this.label11);
             this.Controls.Add(this.groupBox4);
             this.Controls.Add(this.txtRBdebugConsole);
@@ -611,6 +726,9 @@
             this.groupBox3.PerformLayout();
             this.groupBox4.ResumeLayout(false);
             this.groupBox4.PerformLayout();
+            this.groupBox5.ResumeLayout(false);
+            this.groupBox5.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.previewDrawBoard)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -652,17 +770,27 @@
         private System.Windows.Forms.ComboBox CbFeedRate;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Label FileNameLbl;
-        private System.Windows.Forms.RichTextBox txtRBdebugConsole;
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.Label label7;
         private System.Windows.Forms.Label label8;
         private System.Windows.Forms.Label label9;
         private System.Windows.Forms.GroupBox groupBox4;
-        private System.Windows.Forms.Label lblXpos;
-        private System.Windows.Forms.Label lblZpos;
-        private System.Windows.Forms.Label lblSpin;
-        private System.Windows.Forms.Label lblYpos;
         private System.Windows.Forms.Label label11;
+        private System.Windows.Forms.GroupBox groupBox5;
+        private System.Windows.Forms.Label lblWorkspaceSize;
+        private System.Windows.Forms.Label lblXYstepSize;
+        private System.Windows.Forms.Button btnFullPreview;
+        private System.Windows.Forms.Button btnPreview;
+        private System.Windows.Forms.Label label13;
+        private System.Windows.Forms.TextBox tbZperview;
+        private System.Windows.Forms.Button btnSettings;
+        public System.Windows.Forms.RichTextBox txtRBdebugConsole;
+        public System.Windows.Forms.Label lblXpos;
+        public System.Windows.Forms.Label lblZpos;
+        public System.Windows.Forms.Label lblSpin;
+        public System.Windows.Forms.Label lblYpos;
+        public System.Windows.Forms.PictureBox previewDrawBoard;
+        private System.Windows.Forms.CheckBox checkBox1;
     }
 }
 
