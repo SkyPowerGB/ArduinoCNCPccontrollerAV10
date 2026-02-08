@@ -43,6 +43,15 @@ A custom CNC control system consisting of a C# Windows Forms application (built 
 - No precise RPM control (`%V` ≠ real motor speed)  
 
 ---
+## 📚 Third-Party Libraries
+
+- **Newtonsoft.Json**  
+  License: [MIT License](https://github.com/JamesNK/Newtonsoft.Json/blob/master/LICENSE.md)  
+  Used for reading/writing JSON configuration files in the PC application.
+
+- **AccelStepper** (Arduino library)  
+  License: [MIT License](https://www.airspayce.com/mikem/arduino/AccelStepper/)  
+  Used for stepper motor control on the Arduino firmware.
 
 ## 📝 Notes
 
