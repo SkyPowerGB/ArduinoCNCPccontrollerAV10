@@ -50,8 +50,8 @@ A custom CNC control system consisting of a C# Windows Forms application (built 
   Used for reading/writing JSON configuration files in the PC application.
 
 - **AccelStepper** (Arduino library)  
-  License: [MIT License](https://www.airspayce.com/mikem/arduino/AccelStepper/)  
-  Used for stepper motor control on the Arduino firmware.
+  License: GPL v3  
+  Copyright (C) 2009-2023 Mike McCauley  
 
 ## 📝 Notes
 
