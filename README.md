@@ -49,7 +49,8 @@ A custom CNC control system consisting of a C# Windows Forms application (built 
   License: [MIT License](https://github.com/JamesNK/Newtonsoft.Json/blob/master/LICENSE.md)  
   Used for reading/writing JSON configuration files in the PC application.
 
-- **AccelStepper** (Arduino library)  
+
+- **AccelStepper** (Arduino library in firmware)  
   License: GPL v3  
   Copyright (C) 2009-2023 Mike McCauley  
 
