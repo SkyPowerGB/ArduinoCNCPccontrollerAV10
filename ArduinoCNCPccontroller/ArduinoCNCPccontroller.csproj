@@ -78,17 +78,21 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ArduinoCommunicatorV2.cs" />
-    <Compile Include="classes\ArduinoComunicatorV3.cs" />
-    <Compile Include="classes\JsonModelManager.cs" />
-    <Compile Include="classes\SettingsModel.cs" />
+    <Compile Include="classes\Bootstrapper.cs" />
+    <Compile Include="classes\Workers\ArduinoComunicatorV3.cs" />
+    <Compile Include="classes\Helpers\Commander.cs" />
+    <Compile Include="classes\Helpers\Feedback.cs" />
+    <Compile Include="classes\Workers\JsonModelManager.cs" />
+    <Compile Include="classes\Helpers\Painter.cs" />
+    <Compile Include="classes\Models\SettingsModel.cs" />
+    <Compile Include="classes\Helpers\StateManager.cs" />
     <Compile Include="CNC controler.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="CNC controler.Designer.cs">
       <DependentUpon>CNC controler.cs</DependentUpon>
     </Compile>
-    <Compile Include="static\commandList.cs" />
+    <Compile Include="classes\Helpers\commandList.cs" />
     <Compile Include="Forms\FullPreview.cs">
       <SubType>Form</SubType>
     </Compile>

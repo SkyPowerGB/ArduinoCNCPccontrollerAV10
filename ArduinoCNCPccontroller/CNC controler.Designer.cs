@@ -45,6 +45,9 @@
             this.CbSteps = new System.Windows.Forms.ComboBox();
             this.label1 = new System.Windows.Forms.Label();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.btnPosSwitch = new System.Windows.Forms.Button();
+            this.btnMovSwitch = new System.Windows.Forms.Button();
+            this.btnDebugSwitch = new System.Windows.Forms.Button();
             this.label3 = new System.Windows.Forms.Label();
             this.CbFeedRate = new System.Windows.Forms.ComboBox();
             this.XnYnBtn = new System.Windows.Forms.Button();
@@ -62,6 +65,7 @@
             this.RefreshBtn = new System.Windows.Forms.Button();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
             this.btnPreview = new System.Windows.Forms.Button();
+            this.btnFullPreview = new System.Windows.Forms.Button();
             this.FileNameLbl = new System.Windows.Forms.Label();
             this.txtRBdebugConsole = new System.Windows.Forms.RichTextBox();
             this.label5 = new System.Windows.Forms.Label();
@@ -75,14 +79,11 @@
             this.lblYpos = new System.Windows.Forms.Label();
             this.label11 = new System.Windows.Forms.Label();
             this.groupBox5 = new System.Windows.Forms.GroupBox();
-            this.tbZperview = new System.Windows.Forms.TextBox();
             this.label13 = new System.Windows.Forms.Label();
-            this.btnFullPreview = new System.Windows.Forms.Button();
             this.previewDrawBoard = new System.Windows.Forms.PictureBox();
             this.lblXYstepSize = new System.Windows.Forms.Label();
             this.lblWorkspaceSize = new System.Windows.Forms.Label();
             this.btnSettings = new System.Windows.Forms.Button();
-            this.checkBox1 = new System.Windows.Forms.CheckBox();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.groupBox3.SuspendLayout();
@@ -99,7 +100,7 @@
             this.ConnectBtn.TabIndex = 0;
             this.ConnectBtn.Text = "Connect";
             this.ConnectBtn.UseVisualStyleBackColor = true;
-            this.ConnectBtn.Click += new System.EventHandler(this.button1_Click);
+            this.ConnectBtn.Click += new System.EventHandler(this.connectBtn);
             // 
             // PortsList
             // 
@@ -135,7 +136,7 @@
             // YbackBtn
             // 
             this.YbackBtn.Font = new System.Drawing.Font("Microsoft Sans Serif", 27.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
-            this.YbackBtn.Location = new System.Drawing.Point(116, 36);
+            this.YbackBtn.Location = new System.Drawing.Point(113, 36);
             this.YbackBtn.Name = "YbackBtn";
             this.YbackBtn.Size = new System.Drawing.Size(70, 63);
             this.YbackBtn.TabIndex = 2;
@@ -178,7 +179,7 @@
             // 
             // SpindleOnBtn
             // 
-            this.SpindleOnBtn.Location = new System.Drawing.Point(209, 319);
+            this.SpindleOnBtn.Location = new System.Drawing.Point(211, 275);
             this.SpindleOnBtn.Name = "SpindleOnBtn";
             this.SpindleOnBtn.Size = new System.Drawing.Size(70, 54);
             this.SpindleOnBtn.TabIndex = 6;
@@ -188,13 +189,13 @@
             // 
             // SpindleOffBtn
             // 
-            this.SpindleOffBtn.Location = new System.Drawing.Point(27, 319);
+            this.SpindleOffBtn.Location = new System.Drawing.Point(29, 275);
             this.SpindleOffBtn.Name = "SpindleOffBtn";
             this.SpindleOffBtn.Size = new System.Drawing.Size(70, 54);
             this.SpindleOffBtn.TabIndex = 7;
             this.SpindleOffBtn.Text = "Spindle Off";
             this.SpindleOffBtn.UseVisualStyleBackColor = true;
-            this.SpindleOffBtn.Click += new System.EventHandler(this.button9_Click);
+            this.SpindleOffBtn.Click += new System.EventHandler(this.SpindleOffCbtn_Click);
             // 
             // OpenFileD
             // 
@@ -223,7 +224,7 @@
             // 
             this.HomeBtn.BackColor = System.Drawing.Color.Gainsboro;
             this.HomeBtn.Font = new System.Drawing.Font("Microsoft Sans Serif", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
-            this.HomeBtn.Location = new System.Drawing.Point(400, 22);
+            this.HomeBtn.Location = new System.Drawing.Point(400, 19);
             this.HomeBtn.Name = "HomeBtn";
             this.HomeBtn.Size = new System.Drawing.Size(107, 58);
             this.HomeBtn.TabIndex = 15;
@@ -261,7 +262,7 @@
             this.CbSteps.Size = new System.Drawing.Size(68, 21);
             this.CbSteps.TabIndex = 17;
             this.CbSteps.Text = "1";
-            this.CbSteps.SelectedIndexChanged += new System.EventHandler(this.CbSteps_SelectedIndexChanged);
+        
             // 
             // label1
             // 
@@ -274,6 +275,9 @@
             // 
             // groupBox1
             // 
+            this.groupBox1.Controls.Add(this.btnPosSwitch);
+            this.groupBox1.Controls.Add(this.btnMovSwitch);
+            this.groupBox1.Controls.Add(this.btnDebugSwitch);
             this.groupBox1.Controls.Add(this.label3);
             this.groupBox1.Controls.Add(this.CbFeedRate);
             this.groupBox1.Controls.Add(this.XnYnBtn);
@@ -299,10 +303,37 @@
             this.groupBox1.Controls.Add(this.ZDOWN);
             this.groupBox1.Location = new System.Drawing.Point(356, 41);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(525, 384);
+            this.groupBox1.Size = new System.Drawing.Size(525, 408);
             this.groupBox1.TabIndex = 19;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Control";
+            // 
+            // btnPosSwitch
+            // 
+            this.btnPosSwitch.Location = new System.Drawing.Point(176, 360);
+            this.btnPosSwitch.Name = "btnPosSwitch";
+            this.btnPosSwitch.Size = new System.Drawing.Size(75, 42);
+            this.btnPosSwitch.TabIndex = 46;
+            this.btnPosSwitch.Text = "Position ON";
+            this.btnPosSwitch.UseVisualStyleBackColor = true;
+            // 
+            // btnMovSwitch
+            // 
+            this.btnMovSwitch.Location = new System.Drawing.Point(81, 360);
+            this.btnMovSwitch.Name = "btnMovSwitch";
+            this.btnMovSwitch.Size = new System.Drawing.Size(89, 42);
+            this.btnMovSwitch.TabIndex = 45;
+            this.btnMovSwitch.Text = "Movement OFF";
+            this.btnMovSwitch.UseVisualStyleBackColor = true;
+            // 
+            // btnDebugSwitch
+            // 
+            this.btnDebugSwitch.Location = new System.Drawing.Point(0, 360);
+            this.btnDebugSwitch.Name = "btnDebugSwitch";
+            this.btnDebugSwitch.Size = new System.Drawing.Size(75, 42);
+            this.btnDebugSwitch.TabIndex = 44;
+            this.btnDebugSwitch.Text = "Debug ON";
+            this.btnDebugSwitch.UseVisualStyleBackColor = true;
             // 
             // label3
             // 
@@ -331,7 +362,7 @@
             this.CbFeedRate.Size = new System.Drawing.Size(65, 21);
             this.CbFeedRate.TabIndex = 33;
             this.CbFeedRate.Text = "100";
-            this.CbFeedRate.SelectedIndexChanged += new System.EventHandler(this.CbFeedRate_SelectedIndexChanged);
+          
             // 
             // XnYnBtn
             // 
@@ -362,11 +393,12 @@
             "50",
             "25",
             "0"});
-            this.CbSpindleSpd.Location = new System.Drawing.Point(103, 337);
+            this.CbSpindleSpd.Location = new System.Drawing.Point(105, 293);
             this.CbSpindleSpd.Name = "CbSpindleSpd";
             this.CbSpindleSpd.Size = new System.Drawing.Size(100, 21);
             this.CbSpindleSpd.TabIndex = 19;
             this.CbSpindleSpd.Text = "100";
+        
             // 
             // XpYpBtn
             // 
@@ -398,12 +430,12 @@
             this.button1.TabIndex = 28;
             this.button1.Text = "CENTER";
             this.button1.UseVisualStyleBackColor = false;
-            this.button1.Click += new System.EventHandler(this.button1_Click_1);
+            this.button1.Click += new System.EventHandler(this.CenterBtn_Click);
             // 
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(100, 319);
+            this.label2.Location = new System.Drawing.Point(102, 275);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(103, 13);
             this.label2.TabIndex = 20;
@@ -473,6 +505,7 @@
             // groupBox3
             // 
             this.groupBox3.Controls.Add(this.btnPreview);
+            this.groupBox3.Controls.Add(this.btnFullPreview);
             this.groupBox3.Controls.Add(this.FileNameLbl);
             this.groupBox3.Controls.Add(this.OpenFileD);
             this.groupBox3.Controls.Add(this.RunFile);
@@ -495,6 +528,15 @@
             this.btnPreview.UseVisualStyleBackColor = true;
             this.btnPreview.Click += new System.EventHandler(this.previewBtn_Click);
             // 
+            // btnFullPreview
+            // 
+            this.btnFullPreview.Location = new System.Drawing.Point(6, 304);
+            this.btnFullPreview.Name = "btnFullPreview";
+            this.btnFullPreview.Size = new System.Drawing.Size(326, 36);
+            this.btnFullPreview.TabIndex = 46;
+            this.btnFullPreview.Text = "Full Preview";
+            this.btnFullPreview.UseVisualStyleBackColor = true;
+            // 
             // FileNameLbl
             // 
             this.FileNameLbl.AutoSize = true;
@@ -508,7 +550,7 @@
             // txtRBdebugConsole
             // 
             this.txtRBdebugConsole.ImeMode = System.Windows.Forms.ImeMode.Hiragana;
-            this.txtRBdebugConsole.Location = new System.Drawing.Point(17, 541);
+            this.txtRBdebugConsole.Location = new System.Drawing.Point(12, 541);
             this.txtRBdebugConsole.Name = "txtRBdebugConsole";
             this.txtRBdebugConsole.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.Vertical;
             this.txtRBdebugConsole.Size = new System.Drawing.Size(864, 340);
@@ -562,7 +604,7 @@
             this.groupBox4.Controls.Add(this.label9);
             this.groupBox4.Controls.Add(this.label7);
             this.groupBox4.Controls.Add(this.label8);
-            this.groupBox4.Location = new System.Drawing.Point(356, 431);
+            this.groupBox4.Location = new System.Drawing.Point(356, 455);
             this.groupBox4.Name = "groupBox4";
             this.groupBox4.Size = new System.Drawing.Size(525, 64);
             this.groupBox4.TabIndex = 36;
@@ -616,9 +658,7 @@
             // 
             // groupBox5
             // 
-            this.groupBox5.Controls.Add(this.tbZperview);
             this.groupBox5.Controls.Add(this.label13);
-            this.groupBox5.Controls.Add(this.btnFullPreview);
             this.groupBox5.Controls.Add(this.previewDrawBoard);
             this.groupBox5.Controls.Add(this.lblXYstepSize);
             this.groupBox5.Controls.Add(this.lblWorkspaceSize);
@@ -629,37 +669,20 @@
             this.groupBox5.TabStop = false;
             this.groupBox5.Text = "Preview";
             // 
-            // tbZperview
-            // 
-            this.tbZperview.Location = new System.Drawing.Point(233, 470);
-            this.tbZperview.Name = "tbZperview";
-            this.tbZperview.Size = new System.Drawing.Size(100, 20);
-            this.tbZperview.TabIndex = 48;
-            this.tbZperview.Text = "0";
-            // 
             // label13
             // 
             this.label13.AutoSize = true;
-            this.label13.Location = new System.Drawing.Point(230, 454);
+            this.label13.Location = new System.Drawing.Point(7, 452);
             this.label13.Name = "label13";
             this.label13.Size = new System.Drawing.Size(86, 13);
             this.label13.TabIndex = 47;
             this.label13.Text = "Preview Z below";
             // 
-            // btnFullPreview
-            // 
-            this.btnFullPreview.Location = new System.Drawing.Point(10, 444);
-            this.btnFullPreview.Name = "btnFullPreview";
-            this.btnFullPreview.Size = new System.Drawing.Size(203, 52);
-            this.btnFullPreview.TabIndex = 46;
-            this.btnFullPreview.Text = "Full Preview";
-            this.btnFullPreview.UseVisualStyleBackColor = true;
-            // 
             // previewDrawBoard
             // 
             this.previewDrawBoard.Location = new System.Drawing.Point(6, 37);
             this.previewDrawBoard.Name = "previewDrawBoard";
-            this.previewDrawBoard.Size = new System.Drawing.Size(434, 396);
+            this.previewDrawBoard.Size = new System.Drawing.Size(400, 400);
             this.previewDrawBoard.TabIndex = 45;
             this.previewDrawBoard.TabStop = false;
             // 
@@ -691,22 +714,11 @@
             this.btnSettings.UseVisualStyleBackColor = true;
             this.btnSettings.Click += new System.EventHandler(this.btnSettings_Click);
             // 
-            // checkBox1
-            // 
-            this.checkBox1.AutoSize = true;
-            this.checkBox1.Location = new System.Drawing.Point(825, 518);
-            this.checkBox1.Name = "checkBox1";
-            this.checkBox1.Size = new System.Drawing.Size(56, 17);
-            this.checkBox1.TabIndex = 35;
-            this.checkBox1.Text = "debug";
-            this.checkBox1.UseVisualStyleBackColor = true;
-            // 
             // CNC_PC_controller
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1341, 893);
-            this.Controls.Add(this.checkBox1);
+            this.ClientSize = new System.Drawing.Size(1302, 893);
             this.Controls.Add(this.btnSettings);
             this.Controls.Add(this.groupBox5);
             this.Controls.Add(this.label11);
@@ -782,7 +794,6 @@
         private System.Windows.Forms.Button btnFullPreview;
         private System.Windows.Forms.Button btnPreview;
         private System.Windows.Forms.Label label13;
-        private System.Windows.Forms.TextBox tbZperview;
         private System.Windows.Forms.Button btnSettings;
         public System.Windows.Forms.RichTextBox txtRBdebugConsole;
         public System.Windows.Forms.Label lblXpos;
@@ -790,7 +801,9 @@
         public System.Windows.Forms.Label lblSpin;
         public System.Windows.Forms.Label lblYpos;
         public System.Windows.Forms.PictureBox previewDrawBoard;
-        private System.Windows.Forms.CheckBox checkBox1;
+        private System.Windows.Forms.Button btnPosSwitch;
+        private System.Windows.Forms.Button btnMovSwitch;
+        private System.Windows.Forms.Button btnDebugSwitch;
     }
 }
 

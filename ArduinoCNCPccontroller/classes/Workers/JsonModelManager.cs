@@ -48,8 +48,18 @@ namespace ArduinoCNCPccontroller.classes
         {
             string json = JsonConvert.SerializeObject(Settings, Formatting.Indented);
             string temp = dataFile + ".tmp";
+
             File.WriteAllText(temp, json);
-            File.Move(temp, dataFile); 
+
+            
+            if (File.Exists(dataFile))
+            {
+                File.Replace(temp, dataFile, null);
+            }
+            else
+            {
+                File.Move(temp, dataFile);
+            }
         }
 
 

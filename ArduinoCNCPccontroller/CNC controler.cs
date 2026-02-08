@@ -1,16 +1,19 @@
-﻿using System;
+﻿using ArduinoCNCPccontroller.classes;
+using ArduinoCNCPccontroller.Forms;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Diagnostics.Eventing.Reader;
 using System.Drawing;
+using System.IO;
+using System.IO.Ports;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
-using System.IO.Ports;
-using System.Windows.Forms;
-using System.IO;
 using System.Threading;
-using ArduinoCNCPccontroller.classes;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace ArduinoCNCPccontroller
 {
@@ -19,15 +22,20 @@ namespace ArduinoCNCPccontroller
         String[] ports;
         SerialPort port;
 
-        JsonModelManager modelManager;
 
         Point cursor;
         Bitmap canvas;
-    
-        ArduinoCommunicatorV2 communicatorV2;
+
+
+        JsonModelManager modelManager;
+        ArduinoComunicatorV3 communicatorV3;
+        Feedback feedback;
+        
+        
         bool connected = false;
         bool running = false;
-        bool controlActive = true;
+        bool lockControls = false;
+        bool sequenceRunning=false;
         String FilePath;
 
 
@@ -39,13 +47,18 @@ namespace ArduinoCNCPccontroller
 
             cursor = new Point();
             cursor.X = previewDrawBoard.Width / 2;
-            cursor.Y=previewDrawBoard.Height / 2;
-            canvas=new Bitmap(previewDrawBoard.Width, previewDrawBoard.Height);
+            cursor.Y = previewDrawBoard.Height / 2;
+            canvas = new Bitmap(previewDrawBoard.Width, previewDrawBoard.Height);
+
             modelManager = new JsonModelManager();
+            feedback= new Feedback();
+            communicatorV3 = new ArduinoComunicatorV3(null,this);
+
+
             RefreshData();
 
-           
-          
+            txtRBdebugConsole.Text += "canvas width" + previewDrawBoard.Width + "\n";
+
 
             disableControls();
             getAvailableComPorts();
@@ -59,14 +72,73 @@ namespace ArduinoCNCPccontroller
             }
         }
 
+        public void LogLn(string text)
+        {
+            
+            Console.WriteLine(text);
 
+
+
+
+            text += Environment.NewLine;
+
+            if (txtRBdebugConsole.InvokeRequired)
+            {
+                txtRBdebugConsole.Invoke(new Action(() => txtRBdebugConsole.AppendText(text)));
+            }
+            else
+            {
+                txtRBdebugConsole.AppendText(text);
+            }
+        }
+       
+        public void ShowError(string message)
+        {
+            MessageBox.Show(
+          message,       
+          "Error",                       
+          MessageBoxButtons.OK,
+          MessageBoxIcon.Error);
+
+        }
+        public void Inform(string message)
+        {
+            MessageBox.Show(
+    message, // message
+    "Information",                             // title
+    MessageBoxButtons.OK,                       // just OK button
+    MessageBoxIcon.Information                 // info icon
+);
+        }
+        public bool ConfirmWindow(string message)
+        {
+            DialogResult result = MessageBox.Show(
+         message,   // message
+         "Confirmation",               // title
+         MessageBoxButtons.YesNo,      // buttons
+         MessageBoxIcon.Question       // icon
+     );
+
+            if (result == DialogResult.Yes)
+            {
+               return true;
+            }
+            else
+            {
+               return false;
+            }
+       
+        
+        }
+       
+        
         public void RefreshData()
         {
             modelManager.Load();
-            string workspaceSizeLbl= "Workspace:";
-            workspaceSizeLbl += modelManager.Settings.machineWorkspaceMMX;
+            string workspaceSizeLbl = "Workspace:";
+            workspaceSizeLbl += modelManager.Settings.miniPreviewXmm;
             workspaceSizeLbl += "mm x ";
-            workspaceSizeLbl += modelManager.Settings.machineWorkspaceMMY;
+            workspaceSizeLbl += modelManager.Settings.miniPreviewYmm;
             workspaceSizeLbl += "mm";
             lblWorkspaceSize.Text = workspaceSizeLbl;
 
@@ -78,7 +150,7 @@ namespace ArduinoCNCPccontroller
             lblXYstepSize.Text = steps;
 
             var draw = modelManager.Settings.z_draw;
-            tbZperview.Text =draw.ToString();
+          
 
 
         }
@@ -87,92 +159,84 @@ namespace ArduinoCNCPccontroller
         {
             ports = SerialPort.GetPortNames();
         }
-      
+
         private void disableControls()
         {
-            controlActive = false;
+            lockControls = true;
         }
-        private void button1_Click(object sender, EventArgs e)
+        private void connectBtn(object sender, EventArgs e)
         {
+            LogLn(isConnected.ToString());
             if (!isConnected)
             {
-                connectToControler();
+
+                  connectToControler();
+                enableControls();
+                
+          
             }
             else
             {
-                disconnectFromControler();
-                ConnectBtn.Text = "Connect";
+
+                port.Close();
+                isConnected = false;
+                disableControls();
+                connectBtnTxtUpdate();
             }
         }
 
-        private void connectToControler()
+        private void connectBtnTxtUpdate()
         {
             if (isConnected)
             {
-                return;
-            }
-           
-                string selectedPort = PortsList.GetItemText(PortsList.SelectedItem);
-                
-
-                port = new SerialPort(selectedPort, 9600, Parity.None, 8, StopBits.One)
-                {
-                    NewLine = "\n"
-                };
-
-              
-                communicatorV2 = new ArduinoCommunicatorV2(port,txtRBdebugConsole,this);
-
-
-
-
-                bool openPort=communicatorV2.Connect();
-                if (openPort) {
-                    isConnected = true;
-
-
                 ConnectBtn.Text = "Disconnect";
+            }
+            else
+            {
+                ConnectBtn.Text = "Connect";
+            }
+        }
+        private async Task connectToControler()
+        {
+            LogLn("CONNECTING");
+
+            string selectedPort = PortsList.GetItemText(PortsList.SelectedItem);
+            port = new SerialPort(selectedPort, 9600, Parity.None, 8, StopBits.One)
+            {
+                NewLine = "\n"
+            };
+
+            port.Open();
+
+           
+            await Task.Delay(1000);
+           
+           
+            port.DiscardInBuffer();
+            port.DiscardOutBuffer();
+
+            communicatorV3 = new ArduinoComunicatorV3(port, this);
+
             
-            } else
-                {
-                    isConnected = false;
-                }
+            isConnected = await communicatorV3.TestConnection();
+            LogLn("connected"+isConnected);
+            connectBtnTxtUpdate();
 
-
-
-        
         }
 
         private void enableControls()
         {
-            controlActive = true;
+            lockControls = false;
         }
 
-        private void disconnectFromControler()
-        {
-            isConnected = false;
-           
-            controlActive = false;
-            ConnectBtn.Text = "Connect";
-            if (port != null && port.IsOpen)
-            {
-               communicatorV2.Disconnect();
-            }
-            disableControls();
-        }
+ 
+    
 
-        private void button9_Click(object sender, EventArgs e)
-        {
-            if (!isConnected) { return; }
-            communicatorV2.StopSpindle();
-          
-        }
 
-       
         private void OpenFileD_Click(object sender, EventArgs e)
         {
-          
-             
+
+
 
 
 
@@ -180,7 +244,7 @@ namespace ArduinoCNCPccontroller
             OpenFileDialog fileDialog = new OpenFileDialog();
             fileDialog.Filter = "G-code files (*.gcode;*.nc)|*.gcode;*.nc|All files (*.*)|*.*";
             fileDialog.Title = "Select a G-code file";
-            
+
 
             DialogResult result = fileDialog.ShowDialog();
             if (result == DialogResult.OK)
@@ -188,186 +252,137 @@ namespace ArduinoCNCPccontroller
                 FilePath = fileDialog.FileName;
                 String name = Path.GetFileName(FilePath);
                 FileNameLbl.Text = name;
-               
+
+            }
+        }
+
+        private void UpdateRunBtnStuff()
+        {
+            if (running)
+            {
+                RunFile.BackColor = Color.Red;
+                RunFile.Text = "STOP";
+              
+            }
+            else
+            {
+                RunFile.BackColor = Color.LightGreen;
+                RunFile.Text = "Run";
+                
             }
         }
 
         private async void RunFile_Click(object sender, EventArgs e)
         {
-
-            if (!communicatorV2.IsGcStreamRunning())
+            if (!isConnected)
             {
-                RunFile.BackColor = Color.Red;
-                RunFile.Text = "STOP";
+                ShowError("NOT CONNECTED");
+                return;
+            }
+            if (String.IsNullOrEmpty(FilePath))
+            {
+                ShowError("NO FILE  SELECTED");
+                return;
+            }
+          
            
 
+            if (running)
+            {
+                communicatorV3.StopGcodeStream = true;
+                UpdateRunBtnStuff();
+                running = false;
+                lockControls = false;
+                return;
             }
-            else { 
-       
-             
-                RunFile.BackColor = Color.LightGreen;
-                RunFile.Text = "Run";
-                communicatorV2.StopGcStream();
+            LogLn("preping to run gcode : make sure machine is set and calibrated");
+            if (!ConfirmWindow("Do you want run file: " + FileNameLbl.Text))
+            {
+                return;
+            }
+            running = true;
+            lockControls = true;
+            UpdateRunBtnStuff();
+            bool done = await communicatorV3.RunGcode(FilePath, true, false, true, false);
+            if (done)
+            {
+                running = false;
+                if (communicatorV3.isErrorGcStream)
+                {
+                    ShowError(communicatorV3.gcStreamMsg);
+                }
+                else
+                {
+                    Inform(communicatorV3.gcStreamMsg);
+                }
+                    UpdateRunBtnStuff();
+            }
+
+        }
+
+
+        private async void previewBtn_Click(object sender, EventArgs e)
+        {
+            if (!isConnected)
+            {
+                ShowError("NOT CONNECTED");
+                return;
+            }
+            if (String.IsNullOrEmpty(FilePath))
+            {
+                ShowError("NO FILE  SELECTED");
                 return;
             }
 
+            
+     
 
-          
-          
-            if (!isConnected) { return; }
-            disableControls();
-         bool done=  await communicatorV2.StreamGcodeFileAsync(FilePath,0);
+            if (running)
+            {
+                communicatorV3.StopGcodeStream = true;
+                UpdateRunBtnStuff();
+                running = false;
+                lockControls = false;
+                return;
+            }
+            running = true;
+            lockControls = true;
+            UpdateRunBtnStuff();
+            bool done = await communicatorV3.RunGcode(FilePath, true, false, false,true);
             if (done)
             {
-
-                RunFile.BackColor = Color.LightGreen;
-                RunFile.Text = "Run";
-                enableControls();
+                running = false;
+                if (communicatorV3.isErrorGcStream)
+                {
+                    ShowError(communicatorV3.gcStreamMsg);
+                }
+                else
+                {
+                    Inform(communicatorV3.gcStreamMsg);
+                    communicatorV3.resetCursor();
+                }
+                UpdateRunBtnStuff();
             }
-          
         }
+
 
         private void RunBtnStop() { }
 
 
-        private void showErrorMsg(String msg) {
-            MessageBox.Show(msg);
-        }
-
-      
-        private void ShowMessageBox(string message)
-        {
-            if (InvokeRequired)
-            {
-                Invoke((MethodInvoker)(() => { MessageBox.Show(message); }));
-            }
-            else
-            {
-                MessageBox.Show(message);
-            }
-        }
-
+  
+ 
         private void Form1_Load(object sender, EventArgs e)
         {
 
         }
 
-      
-        private void SpindleOnCbtn_Click(object sender, EventArgs e)
-        {
-            if (!isConnected) { return; }
-        }
 
-
-        private void outputLbl_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private void FilePath_TextChanged(object sender, EventArgs e)
-        {
-
-        }
-
-        private void ZcalBtn_Click(object sender, EventArgs e)
-        {
-            if (!isConnected) { return; }
-
-            communicatorV2.ZCal();
-
-
-        }
-
-        private void SendManulaBtn_Click(object sender, EventArgs e)
-        {
-            if (!isConnected) { return; }
-            
-         
-
-        }
-
-        private void YforwardBtn_Click(object sender, EventArgs e)
-        {
-            if (!isConnected) { return; }
-            communicatorV2.MoveAxis('Y', CbSteps.SelectedItem.ToString(), CbFeedRate.SelectedItem.ToString());
-        }
-
-        private void YbackBtn_Click(object sender, EventArgs e)
-        {
-            if (!isConnected) { return; }
-
-            communicatorV2.MoveAxis('Y', "-" + CbSteps.SelectedItem.ToString() , CbFeedRate.SelectedItem.ToString());
-            
-
-        }
-
-        private void XrightBtn_Click(object sender, EventArgs e)
-        {
-            if (!isConnected) { return; }
-
-            communicatorV2.MoveAxis('X', CbSteps.SelectedItem.ToString(), CbFeedRate.SelectedItem.ToString());
-        }
-
-        private void XleftBtn_Click(object sender, EventArgs e)
-        {
-            communicatorV2.MoveAxis('X', "-" + CbSteps.SelectedItem.ToString() , CbFeedRate.SelectedItem.ToString());
-
-         
-        }
-
-        private void ZUP_Click(object sender, EventArgs e)
-        {
-
-            communicatorV2.MoveAxis('Z', CbSteps.SelectedItem.ToString(), CbFeedRate.SelectedItem.ToString());
-        }
-
-        private void ZDOWN_Click(object sender, EventArgs e)
-        {
-
-            communicatorV2.MoveAxis('Z', "-" + CbSteps.SelectedItem.ToString(), CbFeedRate.SelectedItem.ToString());
-        }
-
-        private void HomeBtn_Click(object sender, EventArgs e)
-        {
-            if (!isConnected) { return; }
-
-
-            communicatorV2.Home();
-        }
-
-        private void SpindleOnBtn_Click(object sender, EventArgs e)
-        {
-            if (!isConnected) { return; }
-            float speed = ((float)( double.Parse(CbSpindleSpd.Text)/100) * 20000);
-            communicatorV2.StartSpindle((int)speed);
-            
-        
-        }
-
-        private void SetOriginBtn_Click(object sender, EventArgs e)
-        {
-            if (!isConnected) { return; }
-            communicatorV2.Origin();
-          
-        }
-
-        bool endstopsON = false;
-        private void DisableEndstopsBtn_Click(object sender, EventArgs e)
-        {
-            if (!isConnected) { return; }
-           
-        }
-
-        private void label10_Click(object sender, EventArgs e)
-        {
-
-        }
-
+    
         private void RefreshBtn_Click(object sender, EventArgs e)
         {
             getAvailableComPorts();
             PortsList.Items.Clear();
-            
+
             getAvailableComPorts();
             foreach (string port in ports)
             {
@@ -384,110 +399,251 @@ namespace ArduinoCNCPccontroller
 
         }
 
+
+
+   
+        // STEPPERS-------------------------------------------------------------------------------------------------
         private void DisableSteppersBtn_Click(object sender, EventArgs e)
         {
             if (!isConnected) { return; }
 
-            communicatorV2.DisableSteppers();
-        }
 
-        private void OptionBtnP_Click(object sender, EventArgs e)
-        {
-            if (!isConnected) { return; }
-        }
-
-        private void OptionBtnB_Click(object sender, EventArgs e)
-        {
-            if (!isConnected) { return; }
-        }
-
-        private void RequestMD_Click(object sender, EventArgs e)
-        {
-            if (!isConnected) { return; }
-           
-        
-        }
-
-        private void ResponseLblGcd_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private void machineDataLBL_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private void button1_Click_1(object sender, EventArgs e)
-        {
-            if (!isConnected) { return; }
-            communicatorV2.Center();
-            
         }
 
     
+        //-**************** Move BTNS----------------------------------------------------------------------
+        private async Task PerfromMove(string axis)
+        {
+
+            if (!isConnected)
+            {
+                return;
+            }
+            if (lockControls)
+            {
+                return;
+            }
+            double mm = 0;
+            double feedrate = 0;
+
+            var mmCb = CbSteps.Text;
+            var feedrateCb = CbFeedRate.Text;
+            try
+            {
+                double.TryParse(mmCb, out mm);
+                double.TryParse(feedrateCb, out feedrate);
+            }
+            catch (Exception ex)
+            {
+                return;
+            }
+
+            disableControls();
+            await communicatorV3.PerformMove(axis, mm, feedrate);
+            enableControls();
+        }
+        private void YforwardBtn_Click(object sender, EventArgs e)
+        {
+            PerfromMove("Y");
+
+        }
+        private void YbackBtn_Click(object sender, EventArgs e)
+        {
+            PerfromMove("-Y");
+
+
+
+
+        }
+        private void XrightBtn_Click(object sender, EventArgs e)
+        {
+            PerfromMove("X");
+
+        }
+        private void XleftBtn_Click(object sender, EventArgs e)
+        {
+            PerfromMove("-X");
+
+
+        }
+        private void ZUP_Click(object sender, EventArgs e)
+        {
+            PerfromMove("Z");
+
+        }
+        private void ZDOWN_Click(object sender, EventArgs e)
+        {
+            PerfromMove("-Z");
+
+        }
         private void XpYpBtn_Click(object sender, EventArgs e)
         {
-            communicatorV2.MoveDiagonal('X', 'Y', CbSteps.SelectedItem.ToString(), CbSteps.SelectedItem.ToString() , CbFeedRate.SelectedItem.ToString());
+            PerfromMove("XY");
         }
-
         private void XnYpBtn_Click(object sender, EventArgs e)
         {
-            communicatorV2.MoveDiagonal('X', 'Y', "-" + CbSteps.SelectedItem.ToString()  , CbSteps.SelectedItem.ToString()  , CbFeedRate.SelectedItem.ToString());
+            PerfromMove("-XY");
         }
-
         private void XnYnBtn_Click(object sender, EventArgs e) {
-        
-            communicatorV2.MoveDiagonal('X', 'Y', "-"+ CbSteps.SelectedItem.ToString() ,"-"+ CbSteps.SelectedItem.ToString(), CbFeedRate.SelectedItem.ToString());
+            PerfromMove("-X-Y");
+
         }
         private void XpYnBtn_Click(object sender, EventArgs e)
         {
-            communicatorV2.MoveDiagonal('X', 'Y', CbSteps.SelectedItem.ToString() , "-" + CbSteps.SelectedItem.ToString(), (String)CbFeedRate.SelectedItem);
+            PerfromMove("X-Y");
         }
+        //-------------------------------------------------------------------------------------------------
+        //------- SPINDLE ------------------------------------------------------------------
+        private async Task SpindleChangeRpm()
+        {
+            if (!isConnected)
+            {
+                ShowError("not connected");
+                return;
+            }
+            if (lockControls)
+            {
+                ShowError("Locked");
+                return;
+            }
 
-        private void CbFeedRate_SelectedIndexChanged(object sender, EventArgs e)
+            var pSpeedT = CbSpindleSpd.Text;
+            int speed = 0;
+            double speedP = 0;
+            try
+            {
+                 speedP = Double.Parse(pSpeedT);
+            }
+            catch (Exception ex)
+            {
+                return;
+            }
+            speed = (int)(speedP / 0.01) * 20000;
+
+            disableControls();
+            await communicatorV3.SpindleSet(speed);
+            enableControls();
+        }
+        private async Task spinOff()
+        {
+            if (!isConnected)
+            {
+                ShowError("not connected");
+                return;
+            }
+            if (lockControls)
+            {
+                ShowError("Locked");
+                return;
+            }
+            disableControls();
+            await communicatorV3.StopSpindle();
+            enableControls();
+        }
+    
+        // btn events
+        private void SpindleOnBtn_Click(object sender, EventArgs e)
         {
 
+            SpindleChangeRpm();
+        }
+        private void SpindleOffCbtn_Click(object sender, EventArgs e)
+        {
+            spinOff();
         }
 
-        private void CbSteps_SelectedIndexChanged(object sender, EventArgs e)
+        // ROUTINES-------------------------------------------------------------------------------------------------
+        private async Task HomeRoutine()
         {
+            if (!isConnected) { ShowError("Not connected"); return; }
+            if (lockControls) { ShowError("Locked"); return; }
+            disableControls();
+            sequenceRunning = true;
+            await communicatorV3.HomeAsync();
+            enableControls();
+
+
+        }
+        private async Task ZCalRoutine()
+        {
+            if (!isConnected) { ShowError("Not connected"); return; }
+            if (lockControls) { ShowError("Locked"); return; }
+            disableControls();
+            sequenceRunning = true;
+            await communicatorV3.ZcalAsync();
+            enableControls();
+        }
+        private async Task CenterRoutine()
+        {
+            if (!isConnected) { ShowError("Not connected"); return; }
+            if (lockControls) { ShowError("Locked"); return; }
+            disableControls();
+            sequenceRunning = true;
+            await communicatorV3.CenterAsync();
+            enableControls();
+
+        }
+        private void HomeBtn_Click(object sender, EventArgs e)
+        {
+
+            HomeRoutine();
+
+        }
+        private void SetOriginBtn_Click(object sender, EventArgs e)
+        {
+            if (lockControls)
+            {
+                return;
+            }
+            if (!isConnected)
+            {
+                return;
+            }
+            communicatorV3.SetOrigin();
+
+
+        }
+        private void ZcalBtn_Click(object sender, EventArgs e)
+        {
+            ZCalRoutine();
+
+        }
+        private void CenterBtn_Click(object sender, EventArgs e)
+        {
+            CenterRoutine();
+
 
         }
 
-        private void previewBtn_Click(object sender, EventArgs e)
+       //-------------------------------------------------------------------------------------------------
+    
+        public void drawLine(Point pointA, Point pointB, Color color, int width)
         {
 
-        }
-
-
-        public void drawLine(Point newPoint, Color color, int width)
-        {
-        
-            Point newAbsPoint = new Point(cursor.X + newPoint.X, cursor.Y + newPoint.Y);
 
             if (previewDrawBoard.InvokeRequired)
             {
-                Point drawPointCopy = newAbsPoint; 
+
                 previewDrawBoard.BeginInvoke((MethodInvoker)(() =>
                 {
                     using (Graphics g = Graphics.FromImage(canvas))
                     {
-                        g.DrawLine(new Pen(color, width), cursor, drawPointCopy);
+                        g.DrawLine(new Pen(color, width), pointA, pointB);
                     }
+                    previewDrawBoard.Image = canvas;
                     previewDrawBoard.Invalidate();
-                    cursor = drawPointCopy;
+
                 }));
                 return;
-            }
 
-    
-            using (Graphics g = Graphics.FromImage(canvas))
-            {
-                g.DrawLine(new Pen(color, width), cursor, newAbsPoint);
-            }
+            } else
+
+                using (Graphics g = Graphics.FromImage(canvas))
+                {
+                    g.DrawLine(new Pen(color, width), pointA, pointB);
+                }
             previewDrawBoard.Invalidate();
-            cursor = newAbsPoint;
+        
         }
         public void ClearCanvas()
         {
@@ -515,8 +671,11 @@ namespace ArduinoCNCPccontroller
 
         private void btnSettings_Click(object sender, EventArgs e)
         {
-
+            SettingsForm settingsForm = new SettingsForm();
+            settingsForm.ShowDialog();
         }
+
+        
     }
 
 
