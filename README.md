@@ -44,9 +44,9 @@ A custom CNC control system consisting of a C# Windows Forms application (built 
 
 ## 🔧 Arduino Firmware (`arduinoCNC_V0.0.12U` and beyond)
 
--requires AV12 version of softvare
--adds dry run -> preview
--is plannned to improve arcs and more 
+- requires AV12 version of softvare
+- adds dry run -> preview
+- is plannned to improve arcs and more 
 ----
 ---
 ## 📚 Third-Party Libraries
