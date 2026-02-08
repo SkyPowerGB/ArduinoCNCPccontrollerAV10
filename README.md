@@ -42,6 +42,12 @@ A custom CNC control system consisting of a C# Windows Forms application (built 
 - `R`-parameter arcs unsupported  
 - No precise RPM control (`%V` ≠ real motor speed)  
 
+## 🔧 Arduino Firmware (`arduinoCNC_V0.0.12U` and beyond)
+
+-requires AV12 version of softvare
+-adds dry run -> preview
+-is plannned to improve arcs and more 
+----
 ---
 ## 📚 Third-Party Libraries
 
